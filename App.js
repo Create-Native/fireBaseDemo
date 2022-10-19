@@ -2,13 +2,15 @@ import { StatusBar } from 'expo-status-bar';
 import { onSnapshot, orderBy, query, QuerySnapshot } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Button, SafeAreaView, ScrollView } from 'react-native';
-import {firestore, collection, addDoc, MESSAGES, serverTimestamp} from './firebase/Config'
+import {firestore, collection, addDoc, MESSAGES, serverTimestamp, getAuth, signInWithEmailAndPassword} from './firebase/Config'
 import Constants from 'expo-constants';
 import { convertFirbaseTimeStampToJS } from './helpers/Functions';
+import Login from './components/Login';
 
 export default function App() {
   const [newMessage, setNewMessage] = useState('')
   const [messages, setmessages] = useState([])
+  const [logged, setLogged] = useState(false)
   
   useEffect(() =>{
     const q = query(collection(firestore,MESSAGES), orderBy('created','desc'))
@@ -39,30 +41,35 @@ export default function App() {
       created: serverTimestamp()
     }).catch(error => console.log(error))
     setNewMessage('')
-    console.log('message saved')
   }
 
-  return (
-    <SafeAreaView style={styles.container}>
-
-      <ScrollView>
-        {
-          messages.map((message) => (
-            <View style={styles.message} key={message.id}>
-              <Text style={styles.messageInfo}>{message.created}</Text>
-              <Text>{message.text}</Text>
-            </View>
-          ))
-        }
-        <TextInput 
-          placeholder='Enter new message...'
-          value = {newMessage}
-          onChangeText={text => setNewMessage(text)}
-        />
-      <Button title="save" onPress={save}/>
-      </ScrollView>
-    </SafeAreaView>
-  );
+  if (logged) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView>
+          {
+            messages.map((message) => (
+              <View style={styles.message} key={message.id}>
+                <Text style={styles.messageInfo}>{message.created}</Text>
+                <Text>{message.text}</Text>
+              </View>
+            ))
+          }
+        </ScrollView>
+          <View style={{display: 'flex',flexDirection: 'row', justifyContent: 'space-around'}}>
+            <TextInput style={{flex: 0.75}}
+              placeholder='Enter new message...'
+              value = {newMessage}
+              onChangeText={text => setNewMessage(text)}
+            />
+            <Button style={{flex: 0.25}} title="send" type="button" onPress={save}/>
+          </View>
+        
+      </SafeAreaView>
+    )
+  } else {
+    return <Login setLogin={setLogged}/>
+  }
 }
 
 const styles = StyleSheet.create({
