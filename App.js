@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Button } from 'react-native';
 import {firestore, collection, addDoc, MESSAGES, serverTimestamp} from './firebase/Config'
-
+//testi2
 export default function App() {
   const [newMessage, setNewMessage] = useState('')
 
