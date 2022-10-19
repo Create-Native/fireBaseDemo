@@ -1,5 +1,6 @@
 import {initializeApp} from 'firebase/app'
-import {getFirestore, collection, addDoc, serverTimestamp, orderBy} from 'firebase/firestore'
+import {getFirestore, collection, query, addDoc, onSnapshot, serverTimestamp, orderBy} from 'firebase/firestore'
+import {getAuth, signInWithEmailAndPassword} from "firebase/auth";
 
 
 
@@ -25,5 +26,9 @@ const firebaseConfig = {
     addDoc,
     serverTimestamp,
     orderBy,
-    MESSAGES
+    MESSAGES,
+    query,
+    onSnapshot,
+    getAuth,
+    signInWithEmailAndPassword,
   }
