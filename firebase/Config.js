@@ -1,5 +1,7 @@
 import {initializeApp} from 'firebase/app'
-import {getFirestore, collection, addDoc, serverTimestamp} from 'firebase/firestore'
+import {getFirestore, collection, addDoc, serverTimestamp, orderBy} from 'firebase/firestore'
+
+
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -22,5 +24,6 @@ const firebaseConfig = {
     collection,
     addDoc,
     serverTimestamp,
+    orderBy,
     MESSAGES
   }
