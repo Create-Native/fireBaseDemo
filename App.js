@@ -1,10 +1,30 @@
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, Button } from 'react-native';
+import { onSnapshot, query, QuerySnapshot } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, TextInput, View, Button, SafeAreaView, ScrollView } from 'react-native';
 import {firestore, collection, addDoc, MESSAGES, serverTimestamp} from './firebase/Config'
-//testi2
+import Constants from 'expo-constants';
+
 export default function App() {
   const [newMessage, setNewMessage] = useState('')
+  const [messages, setmessages] = useState([])
+  
+  useEffect(() =>{
+    const q = query(collection(firestore,MESSAGES))
+
+    const unsubscribe = onSnapshot(q,(QuerySnapshot) => {
+      const tempMessages = []
+
+      QuerySnapshot.forEach((doc) => {
+        tempMessages.push(doc.data())
+      })
+      setmessages(tempMessages)
+    })
+
+    return () => {
+      unsubscribe()
+    }
+  }, [])
 
   const save =async()=> {
     const docRef = await addDoc(collection(firestore,MESSAGES),{
@@ -16,22 +36,41 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <TextInput 
-      placeholder='Enter new message...'
-      value = {newMessage}
-      onChangeText={text => setNewMessage(text)}
+        placeholder='Enter new message...'
+        value = {newMessage}
+        onChangeText={text => setNewMessage(text)}
       />
       <Button title="save" onPress={save}/>
-    </View>
+      <ScrollView>
+        {
+          messages.map((message) => (
+            <View style={styles.message}>
+              <Text>{message.text}</Text>
+            </View>
+          ))
+        }
+      </ScrollView>
+    </SafeAreaView>
   );
 }
-// älä välitä
+
 const styles = StyleSheet.create({
   container: {
+    paddingTop: Platform.OS === 'android' ? Constants.StatusBarheight: 0,
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
+  message: {
+    padding:10,
+    marginTop:10,
+    marginBottom:10,
+    backgroundColor: '#f5f5f5',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius5: 5,
+    marginLeft: 10,
+    marginRight: 10,
+  }
 });
